@@ -8,6 +8,10 @@ from django.views import View
 import decimal
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator # for Class Based Views
+from django.http import JsonResponse
+from django.conf import settings
+import json
+import stripe
 
 
 # Create your views here.
@@ -48,6 +52,17 @@ def category_products(request, slug):
         'categories': categories,
     }
     return render(request, 'store/category_products.html', context)
+
+def set_session_data(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        address_id = data.get('address_id')
+        print("hello")
+        print(address_id)
+        request.session['address_id'] = address_id
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False})
 
 
 # Authentication Starts Here
@@ -100,6 +115,7 @@ def remove_address(request, id):
 
 @login_required
 def add_to_cart(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
     user = request.user
     product_id = request.GET.get('prod_id')
     product = get_object_or_404(Product, id=product_id)
@@ -139,6 +155,7 @@ def cart(request):
         'amount': amount,
         'shipping_amount': shipping_amount,
         'total_amount': amount + shipping_amount,
+        'publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
         'addresses': addresses,
     }
     return render(request, 'store/cart.html', context)
@@ -178,7 +195,10 @@ def minus_cart(request, cart_id):
 @login_required
 def checkout(request):
     user = request.user
-    address_id = request.GET.get('address')
+    address_id = request.session.get('address_id')
+    print(address_id)
+    for key, value in request.session.items():
+        print(f"{key}: {value}")
     
     address = get_object_or_404(Address, id=address_id)
     # Get all the products of User in Cart

@@ -16,6 +16,10 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
+if DEBUG:
+    STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
+    STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
+
 ALLOWED_HOSTS = []
 
 
@@ -31,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_extensions',
     'store',
+    'stripe',
 ]
 
 MIDDLEWARE = [

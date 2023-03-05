@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load custom_filters %}
 
     {% block content %}
       <div class="container">
@@ -60,7 +61,7 @@
                         </div>
                       </th>
                       <td class="align-middle border-0">
-                        <p class="mb-0 small">${{cart_product.product.price}}</p>
+                        <p class="mb-0 small">₹{{cart_product.product.price}}</p>
                       </td>
                       <td class="align-middle border-0">
                         <div class="border d-flex align-items-center justify-content-between px-3"><span class="small text-uppercase text-gray headings-font-family">Quantity</span>
@@ -74,7 +75,7 @@
                         </div>
                       </td>
                       <td class="align-middle border-0">
-                        <p class="mb-0 small">${{cart_product.total_price|intcomma}}</p>
+                        <p class="mb-0 small">₹{{cart_product.total_price|intcomma}}</p>
                       </td>
                       <td class="align-middle border-0"><a class="reset-anchor" href="{% url 'store:remove-cart' cart_product.id %}"><i class="fas fa-trash-alt small text-muted"></i></a></td>
                     </tr>
@@ -97,10 +98,10 @@
                 <div class="card-body">
                   <h5 class="text-uppercase mb-4">Cart total</h5>
                   <ul class="list-unstyled mb-0">
-                    <li class="d-flex align-items-center justify-content-between"><strong class="text-uppercase small font-weight-bold">Subtotal</strong><span class="text-muted small">${{amount|intcomma}}</span></li>
-                    <li class="d-flex align-items-center justify-content-between"><strong class="text-uppercase small font-weight-bold">Shipping Charge</strong><span class="text-muted small">+ ${{shipping_amount}}</span></li>
+                    <li class="d-flex align-items-center justify-content-between"><strong class="text-uppercase small font-weight-bold">Subtotal</strong><span class="text-muted small">₹{{amount|intcomma}}</span></li>
+                    <li class="d-flex align-items-center justify-content-between"><strong class="text-uppercase small font-weight-bold">Shipping Charge</strong><span class="text-muted small">+ ₹{{shipping_amount}}</span></li>
                     <li class="border-bottom my-2"></li>
-                    <li class="d-flex align-items-center justify-content-between mb-4"><strong class="text-uppercase small font-weight-bold">Total</strong><span>${{total_amount|intcomma}}</span></li>
+                    <li class="d-flex align-items-center justify-content-between mb-4"><strong class="text-uppercase small font-weight-bold">Total</strong><span>₹{{total_amount|intcomma}}</span></li>
                     <li>
 
                       {% comment %} <form action="#">
@@ -121,7 +122,7 @@
                     {% if addresses %}
                       {% for address in addresses %}
                         <div class="mb-3">
-                        <input type="radio" name="address" value="{{address.id}}"> <strong>Address {{forloop.counter}}</strong> <br>
+                        <input type="radio" name="address" value="{{address.id}}" onclick="sendDataToSession('{{address.id}}')"> <strong>Address {{forloop.counter}}</strong> <br>
                         ( {{address.locality}}, {{address.city}}, {{address.state}} )
                         </div>
                       {% endfor %}
@@ -135,12 +136,76 @@
 
                   </form>
 
+                  <script>
+                  function sendDataToSession(addressId) {
+                    console.log(addressId)
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/set-session-data/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken')); // include the CSRF token
+                    xhr.onreadystatechange = function() {
+                      if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log(xhr.responseText);
+                      }
+                    };
+                    var data = JSON.stringify({'address_id': addressId});
+                    console.log(data)
+                    xhr.send(data);
+                  }
+
+                  // helper function to get the CSRF cookie
+                  function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                      var cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                        }
+                      }
+                    }
+                    return cookieValue;
+                  }
+                </script>
+
+
+
+                    <button  id="my-stripe-button"  class="btn btn-dark btn-lg btn-outline-dark" > <i class="fas fa-dollar-sign mr-2"></i>Online Payment</button>
+
+                   <script>
+                      var stripeButton = document.getElementById('my-stripe-button');
+                      stripeButton.addEventListener('click', function() {
+                        // Open Checkout with further options:
+                        var handler = StripeCheckout.configure({
+                          key: '{{ publishable_key }}',
+                          locale: 'auto',
+                          currency: 'INR',
+                          token: function(token) {
+                            // Redirect to a "checkout" page after the payment has been successfully processed
+                            window.location.href = '/checkout';
+                          }
+                        });
+
+                        handler.open({
+                          name: 'ByWheels.com',
+                          description: 'Online Payment',
+                          amount: {{ total_amount|multiply_by_100 }}
+                        });
+                      });
+                    </script>
+
                 </div>
               </div>
             </div>
 
           </div>
         </section>
+
+             <script type="text/javascript">
+document.getElementsByClassName("stripe-button-el")[0].style.display = "none";
+</script>
         
         {% else %}
 
