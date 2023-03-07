@@ -12,6 +12,9 @@ from django.http import JsonResponse
 from django.conf import settings
 import json
 import stripe
+import openai
+import uuid
+from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
@@ -217,6 +220,65 @@ def orders(request):
     return render(request, 'store/orders.html', {'orders': all_orders})
 
 
+openai.api_key = "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"
+
+model_engine = "text-davinci-002"
+prompt = "What is the capital of France?"
+
+
+@csrf_exempt
+def chat_view(request):
+    if request.method == "POST":
+            data = json.loads(request.body)
+            prompt = data.get("message")
+            print("next line is the message")
+            print(prompt)
+            print(type((request.POST.get("message"))))
+            print(type(prompt))
+            completions = openai.Completion.create(
+                engine=model_engine,
+                prompt=prompt,
+                max_tokens=3097,
+                n=1,
+                stop=None,
+                temperature=0.5,
+            )
+
+            message = completions.choices[0].text
+            print(message)
+            return JsonResponse({"response": message})
+    return render(request, "store/chat.html")
+
+    # if request.method == "POST":
+    #     # Get the user's message from the request data
+    #     message = request.POST.get("message")
+    #
+    #     # # Add the user's message to the conversation object
+    #     # openai.api.Conversation.create(
+    #     #     engine="davinci",
+    #     #     prompt=message,
+    #     #     conversation_id=conversation_id,
+    #     # )
+    #
+    #     # Generate a response from the ChatGPT module
+    #     response = openai.Completion.create(
+    #         engine="davinci",
+    #         prompt=f"Reply: {message}\n",
+    #         max_tokens=1024,
+    #         temperature=0.5,
+    #         n=1,
+    #         stop=None,
+    #     )
+    #
+    #     # Get the generated response from the API response
+    #     text = response.choices[0].text.strip()
+    #
+    #     # Return the response to the client
+    #     return JsonResponse({"response": text})
+    #
+    # else:
+    #     # If the request method is not POST, return an error response
+    #     return JsonResponse({"error": "Invalid request method"})
 
 
 
