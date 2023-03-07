@@ -2319,6 +2319,15 @@ h3,
   font-size: 1.65rem;
 }
 
+.text-center > .col-md-6 {
+  margin: 0 auto;
+  text-align: center;
+  padding:20px;
+
+}
+
+
+
 h4,
 .h4 {
   font-size: 1.4rem;

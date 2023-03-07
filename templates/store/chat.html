@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{#    <div class="col-md-6">#}
+
+      <div class="text-center py-5">
+            <h3 class="mb-3">Ask your queries here!.</h3>
+          <br>
+          <br>
+
+
+  <div class="col-md-6">
+       <form id="chat-form">
+            <div class="input-group">
+              <input type="search" id="chat-input" class="form-control rounded" placeholder="How cycling help my body health?" aria-label="Search" aria-describedby="search-addon" />
+              <button type="submit" class="btn btn-outline-primary">search</button>
+            </div>
+       </form>
+      <br>
+      <div id="response-container"></div>
+      <br>
+
+  </div>
+
+
+
+
+
+    <script>
+        const chatForm = document.querySelector("#chat-form");
+        const chatInput = document.querySelector("#chat-input");
+        const responseContainer = document.querySelector("#response-container");
+
+
+        chatForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            // Get the CSRF token from the cookie
+            const csrfToken = getCookie("csrftoken");
+
+            // Send the user's message to the server
+            const response = await fetch("/chat/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({ message: chatInput.value })
+            });
+
+            // Parse the response JSON and log it to the console
+            const data = await response.json();
+            console.log(data.response);
+            responseContainer.textContent = data.response;
+
+            responseContainer.textContent = data.response;   //sennd to response container
+
+            // Clear the input field
+            chatInput.value = "";
+        });
+
+        // Get the value of a cookie by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+        }
+    </script>
+    </div>
+
+{% endblock %}

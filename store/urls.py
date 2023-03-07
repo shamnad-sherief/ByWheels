@@ -18,6 +18,9 @@ urlpatterns = [
     path('checkout/', views.checkout, name="checkout"),
     path('orders/', views.orders, name="orders"),
     path('set-session-data/', views.set_session_data, name='set_session_data'),
+    path('chat/', views.chat_view, name='chat'),
+
+    path('shop/', views.shop, name="shop"),
 
     #URL for Products
     path('product/<slug:slug>/', views.detail, name="product-detail"),
@@ -25,7 +28,7 @@ urlpatterns = [
     path('<slug:slug>/', views.category_products, name="category-products"),
 
 
-    path('shop/', views.shop, name="shop"),
+
 
     # URL for Authentication
     path('accounts/register/', views.RegistrationView.as_view(), name="register"),
