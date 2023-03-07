@@ -15,6 +15,7 @@ import stripe
 import openai
 import uuid
 from django.views.decorators.csrf import csrf_exempt
+from decouple import config
 
 
 # Create your views here.
@@ -220,10 +221,8 @@ def orders(request):
     return render(request, 'store/orders.html', {'orders': all_orders})
 
 
-openai.api_key = "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"
-
+openai.api_key = config('OPEN_API_KEY')
 model_engine = "text-davinci-002"
-prompt = "What is the capital of France?"
 
 
 @csrf_exempt
