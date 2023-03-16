@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'cyclestore.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': config('DB_ENGINE'),
         'NAME': config('DB_NAME'),
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '/opt/lampp/var/mysql/mysql.sock',
-        'PORT': '3306',
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASS'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
 	}
 }
 
