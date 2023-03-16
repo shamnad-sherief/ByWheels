@@ -52,6 +52,17 @@ class Product(models.Model):
         return self.title
 
 
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.CASCADE)
+    product = models.OneToOneField(Product, verbose_name="Product", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created Date")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated Date")
+
+    def __str__(self):
+        return str(self.user)
+
+
+
 class Cart(models.Model):
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name="Product", on_delete=models.CASCADE)

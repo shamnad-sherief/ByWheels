@@ -20,7 +20,7 @@ if DEBUG:
     STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
     STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition

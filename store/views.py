@@ -109,6 +109,11 @@ class AddressView(View):
             messages.success(request, "New Address Added Successfully.")
         return redirect('store:profile')
 
+@login_required
+def wishlist(request):
+     print("hello")
+
+
 
 @login_required
 def remove_address(request, id):
